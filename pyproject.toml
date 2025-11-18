@@ -19,6 +19,10 @@ uvicorn = { extras = ["standard"], version = "*" }
 fastapi = "*"
 requests = "*"
 kaggle = "*"
+category_encoders = "*"
+xgboost = "*"
+lightgbm = "*"
+catboost = "*"
 
 
 [tool.poetry.dev-dependencies]
