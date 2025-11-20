@@ -20,7 +20,7 @@ fastapi = "*"
 requests = "*"
 kaggle = "*"
 category_encoders = "*"
-xgboost = "*"
+xgboost = "^3.0.0"
 lightgbm = "*"
 catboost = "*"
 
