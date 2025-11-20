@@ -20,9 +20,10 @@ fastapi = "*"
 requests = "*"
 kaggle = "*"
 category_encoders = "*"
-xgboost = "^3.0.0"
+xgboost = "3.1.1"
 lightgbm = "*"
 catboost = "*"
+bentoml = "*"
 
 
 [tool.poetry.dev-dependencies]

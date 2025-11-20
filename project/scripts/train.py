@@ -19,11 +19,49 @@ warnings.filterwarnings("ignore")
 pd.set_option("display.max_columns", None)
 sns.set(style="whitegrid")
 
+import bentoml
+
 if __name__ == "__main__":
+
+    num_cols = [
+    "annual_income",
+    "debt_to_income_ratio",
+    "credit_score",
+    "loan_amount",
+    "interest_rate"
+    ]
+    
+    cat_cols = [
+        "gender",
+        "marital_status",
+        "education_level",
+        "employment_status",
+        "loan_purpose",
+        "grade_subgrade"
+    ]
+    
+    # You can add binary flags (if any exist)
+    bool_cols = []  
+    
+    # Columns to encode using Target Encoding (categorical + bools)
+    cols_to_encode = cat_cols + bool_cols
+    
+    # ColumnTransformer for preprocessing
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("target_enc", TargetEncoder(cols=cols_to_encode, smoothing=25.0), cols_to_encode),
+            ("scaler", StandardScaler(), num_cols)
+        ],
+        remainder="drop"
+    )
 
     X = pd.read_csv("project/X_train.csv")
     y = pd.read_csv("project/y_train.csv")
-    
+
+    # Ensure all object columns are converted to 'category' type
+    for col in X.select_dtypes(include=['object']).columns:
+        X[col] = X[col].astype('category')
+
     cv_results = {}
     
     # Classification metrics
@@ -35,7 +73,7 @@ if __name__ == "__main__":
         "ROC_AUC": "roc_auc"
     }
     
-    # XGBoost Hyperparameters (Tuned for 80/20 Imbalance)
+    # # XGBoost Hyperparameters (Tuned for 80/20 Imbalance)
     params = {
         'n_estimators': 1000,
         'learning_rate': 0.05,
@@ -46,11 +84,12 @@ if __name__ == "__main__":
         'eval_metric': 'auc',
         'random_state': 42,
         'n_jobs': -1,
-        'tree_method': 'hist' # Faster training
+        'tree_method': 'hist',  # Faster training
+        'enable_categorical': True  # Enable categorical support
     }
     
     kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    oof_preds = np.zeros(len(X))
+    # oof_preds = np.zeros(len(X))
     scores = []
     
     model = XGBClassifier(**params)
@@ -63,8 +102,8 @@ if __name__ == "__main__":
     
         cv_scores = cross_validate(
             pipeline,
-            X_train,
-            y_train,
+            X,
+            y,
             cv=kf,
             scoring=scoring,
             n_jobs=-1
@@ -87,3 +126,18 @@ if __name__ == "__main__":
             "ROC_AUC": cv_results[model]["test_ROC_AUC"]
         } for model in cv_results.keys()
     }).T.round(4)
+
+    best_model_name = results_df['ROC_AUC'].idxmax()
+    best_model = models[best_model_name]
+
+    # Fit the best model before saving
+    if not hasattr(best_model, 'fit'):
+        raise ValueError(f"The selected model '{best_model_name}' does not support fitting.")
+
+    best_model = model
+    best_model_name = "XGBoost"
+    print(f"Fitting the best model: {best_model_name}...")
+    best_model.fit(X, y)
+
+    # Save the fitted model
+    best_model.save_model('project/model.json')
