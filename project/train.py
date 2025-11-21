@@ -15,6 +15,8 @@ from xgboost import XGBClassifier
 
 from sklearn.metrics import roc_auc_score, roc_curve
 
+import joblib
+
 warnings.filterwarnings("ignore")
 pd.set_option("display.max_columns", None)
 sns.set(style="whitegrid")
@@ -55,9 +57,9 @@ if __name__ == "__main__":
         remainder="drop"
     )
 
-    X = pd.read_csv("project/X_train.csv")
-    y = pd.read_csv("project/y_train.csv")
-
+    X = pd.read_csv("data/X_train.csv")
+    y = pd.read_csv("data/y_train.csv")
+    print("Training data loaded.")
     # Ensure all object columns are converted to 'category' type
     for col in X.select_dtypes(include=['object']).columns:
         X[col] = X[col].astype('category')
@@ -94,6 +96,7 @@ if __name__ == "__main__":
     
     model = XGBClassifier(**params)
     models = {"XGBoost":model}
+    pipeline = None
     for name, model in models.items():
         pipeline = Pipeline([
             ("preprocessor", preprocessor),
@@ -134,10 +137,11 @@ if __name__ == "__main__":
     if not hasattr(best_model, 'fit'):
         raise ValueError(f"The selected model '{best_model_name}' does not support fitting.")
 
-    best_model = model
+    
     best_model_name = "XGBoost"
     print(f"Fitting the best model: {best_model_name}...")
-    best_model.fit(X, y)
+
+    pipeline.fit(X, y)
 
     # Save the fitted model
-    best_model.save_model('project/model.json')
+    joblib.dump(pipeline, 'project/fitted_pipeline.joblib')

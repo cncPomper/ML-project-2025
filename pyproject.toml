@@ -25,7 +25,6 @@ lightgbm = "*"
 catboost = "*"
 bentoml = "*"
 
-
 [tool.poetry.dev-dependencies]
 
 [build-system]

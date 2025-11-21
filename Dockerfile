@@ -1,22 +1,58 @@
+# FROM agrigorev/zoomcamp-model:2025
+
+# ENV POETRY_VIRTUALENVS_CREATE=false \
+#     POETRY_NO_INTERACTION=1
+
+# RUN pip install poetry
+
+# WORKDIR /app
+
+# COPY ["pyproject.toml", "poetry.lock", "pypi_description.md", "./"]
+
+# COPY ["project/fitted_pipeline.joblib", "project/"]
+
+# WORKDIR /app/project
+
+# COPY ["/project/", "./"]
+
+# RUN poetry install
+
+# COPY . /app/
+
+# EXPOSE 8000
+
+# CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
 FROM agrigorev/zoomcamp-model:2025
 
+# 1. Set environment variables
 ENV POETRY_VIRTUALENVS_CREATE=false \
     POETRY_NO_INTERACTION=1
 
 RUN pip install poetry
 
+# 2. Set the WORKDIR to the root of your application
 WORKDIR /app
 
+# 3. Copy only dependency files for efficient layer caching
+# If pyproject.toml changes, only this layer and subsequent layers rebuild.
 COPY ["pyproject.toml", "poetry.lock", "pypi_description.md", "./"]
 
-WORKDIR /app/project
+# 4. Install dependencies
+# This creates the virtual environment environment inside the image
+RUN poetry install --no-root
 
-COPY ["/project/", "./"]
+# 5. Copy the application source code and the model file
+# Copy the entire project folder and its contents
+COPY project/ ./project/ 
 
-RUN poetry install
+# If you have other files at the root of your project, copy them here
+# COPY . . 
 
-COPY . /app/
-
+# 6. Expose the port
 EXPOSE 8000
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# 7. Define the command to run the application
+# We use the full path to the app file: project/app.py
+CMD ["uvicorn", "project.app:app", "--host", "0.0.0.0", "--port", "8000"] 
+# Note: I removed --reload as it's not suitable for production containers.
