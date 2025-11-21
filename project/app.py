@@ -126,7 +126,7 @@ def predict(input_data: PredictionInput) -> List[float]:
 
     preds = model.predict_proba(input_data)[:, 1]
 
-    return preds.tolist()
+    return {"y_pred":preds.tolist()}
 
 @app.get("/health")
 def health_check():

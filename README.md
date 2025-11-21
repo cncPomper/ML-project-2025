@@ -104,6 +104,11 @@ docker run -it --rm -p 8000:8000 mlzoomcamp
 curl "http://127.0.0.1:8000/health"
 ```
 
+Output
+```
+{"status":"ok","model":{"model_loaded":true,"model_path":"project/fitted_pipeline.joblib","model_type":"sklearn"}}
+```
+
 ## Predict
 ```bash
 curl -X POST "http://127.0.0.1:8000/predict" \
@@ -122,4 +127,9 @@ curl -X POST "http://127.0.0.1:8000/predict" \
     "loan_purpose": "Other",
     "grade_subgrade": "D5"
 }'
+```
+
+Output
+```
+{"y_pred":[0.9385058283805847]}
 ```
