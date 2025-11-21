@@ -98,3 +98,28 @@ docker build -t mlzoomcamp -f Dockerfile .
 ```bash
 docker run -it --rm -p 8000:8000 mlzoomcamp
 ```
+
+## Health check
+```bash
+curl "http://127.0.0.1:8000/health"
+```
+
+## Predict
+```bash
+curl -X POST "http://127.0.0.1:8000/predict" \
+-H "Content-Type: application/json" \
+-d '{
+    "id": 593994,
+    "annual_income": 28781.05,
+    "debt_to_income_ratio": 0.049,
+    "credit_score": 626,
+    "loan_amount": 11461.42,
+    "interest_rate": 14.73,
+    "gender": "Female",
+    "marital_status": "Single",
+    "education_level": "High School",
+    "employment_status": "Employed",
+    "loan_purpose": "Other",
+    "grade_subgrade": "D5"
+}'
+```
