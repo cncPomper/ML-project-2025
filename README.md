@@ -45,12 +45,11 @@ unzip playground-series-s5e11.zip -d data/
 ## 📂 Repository Structure
 
 ```text
-├── data/                  # CSV files or download scripts
-├── notebooks/
-│   └── notebook.ipynb     # Data cleaning, EDA, Model selection, Parameter tuning
+├── data/                  # CSV files or download scripts  
 ├── scripts/
-│   ├── train.py           # Script to train the final model and save to pickle/Bento
-│   └── predict.py         # Flask/BentoML script for serving predictions
+│   └── notebook.ipynb     # Data cleaning, EDA, Model selection, Parameter tuning
+├── train.py               # Script to train the final model and save to pickle/Bento
+└── predict.py             # Flask/BentoML script for serving predictions
 ├── Dockerfile             # Docker container definition
 ├── Pipenv & Pipenv.lock   # Dependency management
 ├── requirements.txt       # Alternative dependency file
